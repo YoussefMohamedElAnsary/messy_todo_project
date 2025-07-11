@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Clean ToDo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1>Todo List</h1>
+  <input id="taskInput" type="text" placeholder="Enter a task">
+  <button onclick="addTask()">Add Task</button>
+  <ul id="taskList"></ul>
+  <div class="completedText"></div>
+
+  <script>
+    const taskArray = [];
+    let counter = 0;
+    const completedText = document.querySelector('.completedText');
+
+    function addTask() {
+      const taskTextBox = document.getElementById("taskInput");
+      const task = taskTextBox.value.trim();
+
+      if (task) {
+        const newTask = {
+          id: counter++,
+          name: task,
+          done: false
+        };
+
+        taskArray.push(newTask); //push new task into array 
+        taskTextBox.value = "";
+        renderAllTasks();
+      }
+    }
+
+    function renderAllTasks() {
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+
+      taskArray.forEach(task => {
+        const listItem = document.createElement("li");
+        if (task.done) {
+          listItem.classList.add("completed"); //add completed class to tasks that are toggled
+        }
+
+        listItem.innerHTML = `
+          <span class="task-text">${task.name}</span>
+          <div class="task-actions">
+            <button onclick="toggleTask(${task.id})">${task.done ? 'Undo' : 'Complete'}</button>
+            <button onclick="deleteTask(${task.id})">Delete</button>
+          </div>
+        `;
+
+        taskList.appendChild(listItem);
+      });
+
+      updateCompletionMessage();
+    }
+
+    function toggleTask(id) {
+      const task = taskArray.find(t => t.id === id);
+      if (task) {
+        task.done = !task.done;
+        renderAllTasks();
+      }
+    }
+
+    function deleteTask(id) {
+      const index = taskArray.findIndex(task => task.id === id);
+      if (index !== -1) {
+        taskArray.splice(index, 1);
+        renderAllTasks();
+      }
+    }
+
+    function updateCompletionMessage() {
+      const allDone = taskArray.length > 0 && taskArray.every(task => task.done);
+      completedText.textContent = allDone ? "All tasks completed! 🎉" : "";
+      completedText.style.display = allDone ? "block" : "none";
+    }
+
+  </script>
+</body>
+
+</html>
